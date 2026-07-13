@@ -1,7 +1,7 @@
 import { execFileSync } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
-import { YT_DLP_PATH, FFMPEG_PATH, BIN_DIR, TEMP_DIR } from "../config";
+import { YT_DLP_PATH, FFMPEG_PATH, BIN_DIR, TEMP_DIR, COOKIES_FROM_BROWSER } from "../config";
 
 export interface DownloadResult {
   videoPath: string;
@@ -23,6 +23,17 @@ export class VideoDownloader {
     return url;
   }
 
+  private static getYtDlpArgs(extraArgs: string[]): string[] {
+    const args = [
+      "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "--add-header", "Referer:https://www.douyin.com/"
+    ];
+    if (COOKIES_FROM_BROWSER) {
+      args.push("--cookies-from-browser", COOKIES_FROM_BROWSER);
+    }
+    return [...args, ...extraArgs];
+  }
+
   /**
    * Downloads a video from TikTok, Douyin, or YouTube, and extracts its audio.
    * @param url The video URL
@@ -35,10 +46,10 @@ export class VideoDownloader {
     // Get video title first
     let title = "video";
     try {
-      const titleOutput = execFileSync(YT_DLP_PATH, [
+      const titleOutput = execFileSync(YT_DLP_PATH, this.getYtDlpArgs([
         "--get-title",
         url
-      ]).toString().trim();
+      ])).toString().trim();
       if (titleOutput) {
         title = titleOutput.replace(/[\\/:*?"<>|]/g, "_"); // sanitize file name characters
       }
@@ -56,13 +67,13 @@ export class VideoDownloader {
     console.log(`Downloading video with yt-dlp...`);
     
     // Execute yt-dlp to download video and audio
-    execFileSync(YT_DLP_PATH, [
+    execFileSync(YT_DLP_PATH, this.getYtDlpArgs([
       "--ffmpeg-location", BIN_DIR,
       "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
       "--merge-output-format", "mp4",
       "-o", videoPath,
       url
-    ], { stdio: "inherit" });
+    ]), { stdio: "inherit" });
 
     if (!fs.existsSync(videoPath)) {
       throw new Error("yt-dlp failed to download the video file.");
