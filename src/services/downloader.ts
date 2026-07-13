@@ -1,7 +1,7 @@
 import { execFileSync } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
-import { YT_DLP_PATH, FFMPEG_PATH, BIN_DIR, TEMP_DIR, COOKIES_FROM_BROWSER } from "../config";
+import { YT_DLP_PATH, FFMPEG_PATH, BIN_DIR, TEMP_DIR, COOKIES_FROM_BROWSER, WORKSPACE_DIR } from "../config";
 
 export interface DownloadResult {
   videoPath: string;
@@ -28,7 +28,12 @@ export class VideoDownloader {
       "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       "--add-header", "Referer:https://www.douyin.com/"
     ];
-    if (COOKIES_FROM_BROWSER) {
+    
+    const cookiesTxtPath = path.join(WORKSPACE_DIR, "cookies.txt");
+    if (fs.existsSync(cookiesTxtPath)) {
+      console.log("Using local 'cookies.txt' file for yt-dlp authentication.");
+      args.push("--cookies", cookiesTxtPath);
+    } else if (COOKIES_FROM_BROWSER) {
       args.push("--cookies-from-browser", COOKIES_FROM_BROWSER);
     }
     return [...args, ...extraArgs];
