@@ -1,8 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
-import axios from "axios";
 import { generateEdgeTTS } from "../utils/edge-tts";
-import { TEMP_DIR, ELEVENLABS_API_KEY, DEFAULT_FEMALE_VOICE, DEFAULT_MALE_VOICE } from "../config";
+import { TEMP_DIR, DEFAULT_FEMALE_VOICE, DEFAULT_MALE_VOICE } from "../config";
 import { TranslatedSegment } from "../core/interfaces/ITranslationProvider";
 
 export interface TTSSegmentResult {
@@ -12,7 +11,7 @@ export interface TTSSegmentResult {
 
 export class TTSService {
   /**
-   * Generates audio for a single text segment using the appropriate voice.
+   * Generates audio for a single text segment using the Edge-TTS voice.
    */
   public static async generateSpeechForSegment(
     text: string, 
@@ -29,48 +28,6 @@ export class TTSService {
     // Determine voice gender mapping
     const isFemale = speakerId.toLowerCase().includes("1") || speakerId.toLowerCase().includes("female") || index % 2 === 0;
     
-    if (ELEVENLABS_API_KEY) {
-      console.log(`[ElevenLabs] Synthesizing segment ${index} for ${speakerId}...`);
-      try {
-        // ElevenLabs default voices:
-        // Rachel (Female): 21m00Tcm4TlvDq8ikWAM
-        // Adam (Male): pNInz6obpgq5paNsJ7vm
-        const voiceId = isFemale ? "21m00Tcm4TlvDq8ikWAM" : "pNInz6obpgq5paNsJ7vm";
-        const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
-        
-        const response = await axios({
-          method: "POST",
-          url,
-          headers: {
-            "xi-api-key": ELEVENLABS_API_KEY,
-            "Content-Type": "application/json"
-          },
-          data: {
-            text: text,
-            model_id: "eleven_multilingual_v2",
-            voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.75
-            }
-          },
-          responseType: "stream"
-        });
-
-        const writer = fs.createWriteStream(outputPath);
-        response.data.pipe(writer);
-
-        await new Promise<void>((resolve, reject) => {
-          writer.on("finish", resolve);
-          writer.on("error", reject);
-        });
-
-        return outputPath;
-      } catch (err) {
-        console.warn(`ElevenLabs TTS failed for segment ${index}. Falling back to Edge-TTS. Error:`, err);
-        // Fall back to Edge TTS
-      }
-    }
-
     // Edge-TTS default
     const voice = isFemale ? DEFAULT_FEMALE_VOICE : DEFAULT_MALE_VOICE;
     console.log(`[EdgeTTS] Synthesizing segment ${index} using ${voice}...`);
@@ -103,3 +60,4 @@ export class TTSService {
     return results;
   }
 }
+

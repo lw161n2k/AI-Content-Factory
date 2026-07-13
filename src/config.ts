@@ -14,7 +14,6 @@ export const FFPROBE_PATH = path.join(BIN_DIR, "ffprobe.exe");
 export const YT_DLP_PATH = path.join(BIN_DIR, "yt-dlp.exe");
 
 export const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-export const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
 
 export const DEFAULT_FEMALE_VOICE = process.env.DEFAULT_FEMALE_VOICE || "vi-VN-HoaiMyNeural";
 export const DEFAULT_MALE_VOICE = process.env.DEFAULT_MALE_VOICE || "vi-VN-NamMinhNeural";
