@@ -10,12 +10,26 @@ export interface DownloadResult {
 }
 
 export class VideoDownloader {
+  private static normalizeUrl(url: string): string {
+    if (url.includes("douyin.com")) {
+      const modalMatch = url.match(/modal_id=([0-9]+)/);
+      if (modalMatch && modalMatch[1]) {
+        const videoId = modalMatch[1];
+        const normalized = `https://www.douyin.com/video/${videoId}`;
+        console.log(`Normalizing Douyin URL: ${url} -> ${normalized}`);
+        return normalized;
+      }
+    }
+    return url;
+  }
+
   /**
    * Downloads a video from TikTok, Douyin, or YouTube, and extracts its audio.
    * @param url The video URL
    * @returns The paths to the downloaded video and extracted audio
    */
   public static download(url: string): DownloadResult {
+    url = this.normalizeUrl(url);
     console.log(`Starting download for: ${url}`);
     
     // Get video title first
