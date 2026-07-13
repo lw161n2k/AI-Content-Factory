@@ -1,35 +1,35 @@
-import { GoogleGenerativeAI, Schema, Type } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/files";
 import { GEMINI_API_KEY } from "../config";
 import { TranscriptionSegment } from "../core/interfaces/ISTTProvider";
 
-const transcriptionSchema: Schema = {
-  type: Type.OBJECT,
+const transcriptionSchema = {
+  type: "OBJECT",
   properties: {
     segments: {
-      type: Type.ARRAY,
+      type: "ARRAY",
       description: "List of transcribed speech segments in chronological order.",
       items: {
-        type: Type.OBJECT,
+        type: "OBJECT",
         properties: {
           index: {
-            type: Type.INTEGER,
+            type: "INTEGER",
             description: "1-based incremental index of the segment."
           },
           startTime: {
-            type: Type.NUMBER,
+            type: "NUMBER",
             description: "Start time of the speech in seconds (decimal format)."
           },
           endTime: {
-            type: Type.NUMBER,
+            type: "NUMBER",
             description: "End time of the speech in seconds (decimal format)."
           },
           text: {
-            type: Type.STRING,
+            type: "STRING",
             description: "The transcription of what was said in the original spoken language."
           },
           speakerId: {
-            type: Type.STRING,
+            type: "STRING",
             description: "An identifier for the speaker, e.g. SPEAKER_1, SPEAKER_2. Perform speaker diarization to separate voices."
           }
         },
@@ -103,7 +103,7 @@ export class VideoTranscriber {
           responseMimeType: "application/json",
           responseSchema: transcriptionSchema,
           temperature: 0.1 // Keep it deterministic for timestamps
-        }
+        } as any
       });
 
       const responseText = result.response.text();

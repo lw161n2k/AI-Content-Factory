@@ -1,34 +1,34 @@
-import { GoogleGenerativeAI, Schema, Type } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GEMINI_API_KEY } from "../config";
 import { TranscriptionSegment } from "../core/interfaces/ISTTProvider";
 import { TranslatedSegment } from "../core/interfaces/ITranslationProvider";
 
-const translationSchema: Schema = {
-  type: Type.OBJECT,
+const translationSchema = {
+  type: "OBJECT",
   properties: {
     segments: {
-      type: Type.ARRAY,
+      type: "ARRAY",
       description: "List of translated script segments.",
       items: {
-        type: Type.OBJECT,
+        type: "OBJECT",
         properties: {
           index: {
-            type: Type.INTEGER
+            type: "INTEGER"
           },
           startTime: {
-            type: Type.NUMBER
+            type: "NUMBER"
           },
           endTime: {
-            type: Type.NUMBER
+            type: "NUMBER"
           },
           speakerId: {
-            type: Type.STRING
+            type: "STRING"
           },
           originalText: {
-            type: Type.STRING
+            type: "STRING"
           },
           translatedText: {
-            type: Type.STRING,
+            type: "STRING",
             description: "Vietnamese translation. Must be natural, engaging, emotional, and adapted to fit the available time window."
           }
         },
@@ -87,7 +87,7 @@ export class VideoScriptTranslator {
         responseMimeType: "application/json",
         responseSchema: translationSchema,
         temperature: 0.3 // balanced creativity vs accuracy
-      }
+      } as any
     });
 
     const responseText = result.response.text();
