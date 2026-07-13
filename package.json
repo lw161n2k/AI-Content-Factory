@@ -1,0 +1,24 @@
+{
+  "name": "ai-content-factory-cli",
+  "version": "1.0.0",
+  "description": "AI Content Factory Local CLI",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "download-bin": "ts-node src/utils/downloader-bin.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.11.1",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "uuid": "^9.0.1",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/uuid": "^9.0.8",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
